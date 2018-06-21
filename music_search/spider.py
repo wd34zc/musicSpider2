@@ -2,10 +2,11 @@
 通过urllib请求
 '''
 import json
-import os
 from urllib import request, parse
+import requests
+from tqdm import tqdm
 
-from io_util import IOUtil
+from download.io_util import IOUtil
 from music_search.header import Header
 
 
@@ -23,36 +24,10 @@ class MusicSearchSpider:
                 return
         if url2 is None:
             print(song + "获取下载连接失败。")
-        music = MusicSearchSpider.spider2(url2)
+        # music = MusicSearchSpider.download_music_with_tqdm(url2, path, music_name)
+        music = MusicSearchSpider.download_music(url2)
         print(song + ': 下载完毕:')
         IOUtil.save_music(path, music, music_name)
-
-    @staticmethod
-    def music_search_spider2(song_url, path):
-        html = MusicSearchSpider.spider1(song_url)
-
-        url2, singer, song = MusicSearchSpider.parse(html)
-        if url2 is None:
-            print(song + "获取下载连接失败。")
-        music = MusicSearchSpider.spider2(url2)
-        music_name = singer + ' - ' + song + '.mp3'
-        f = open(path + '/' + music_name, "wb")
-        f.write(music)
-        f.close()
-        print('保存完毕：' + path + '/' + music_name )
-
-    @staticmethod
-    def music_search_spider3(song_url, path):
-        html = MusicSearchSpider.spider1(song_url)
-
-        url2, singer, song = MusicSearchSpider.parse(html)
-        music_name = singer + ' - ' + song + '.mp3'
-        if url2 is None:
-            print(song + "获取下载连接失败。")
-        music = MusicSearchSpider.spider2(url2)
-        print(song + ': 下载完毕:')
-        IOUtil.save_music(path, music, music_name)
-        return music_name
 
     @staticmethod
     def spider1(song_url):
@@ -74,6 +49,26 @@ class MusicSearchSpider:
         response = request.urlopen(req).read()
         return response
 
+    @staticmethod
+    def download_music_with_tqdm(url2, path, song):
+        # req = requests.get(url2, stream=True)
+        # length = req.headers['content-length']
+        # response = req.content
+        response = requests.get(url2, stream=True)
+        print("\r文件总大小：" + response.headers['content-length'])
+        # 用response储存在获取url的响应
+        with open(path+'/'+song, "wb") as handle:
+            # 打开本地文件夹路径filename，以二进制写入，命名为handle
+            for data in tqdm(response.iter_content()):
+                # tqdm进度条的使用,for data in tqdm(iterable)
+                handle.write(data)
+            # 在handle对象中写入data数据
+        return response
+
+    @staticmethod
+    def download_music(url):
+        req = requests.get(url)
+        return req.content
 
     @staticmethod
     def parse(data_str):

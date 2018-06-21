@@ -1,8 +1,7 @@
 import os
 import re
 
-from entity import Song
-import settings
+from download.entity import Song
 
 
 class IOUtil:
@@ -10,7 +9,7 @@ class IOUtil:
     @staticmethod
     def read_conf():
         conf = {}
-        file = open('configure.conf')
+        file = open('download/configure.conf')
         for line in file:
             line = line.strip()
             if line[0:2] == "//":
