@@ -77,6 +77,7 @@ class MusicSearchSpider:
         music_msg = data['data'][0]
         url = music_msg['url']
         singer = music_msg['author']
+        singer = singer.replace(',', ' & ')
         title = music_msg['title']
         print(singer + " " + title)
         # print(url)

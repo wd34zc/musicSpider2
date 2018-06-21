@@ -10,8 +10,8 @@ def rename(a, b):
 
 spe = ['张惠妹 - 记得 - 林俊杰 不懂.mp3']
 
-# path = 'F:/QQ栋'
-path = 'I:/QQ栋'
+path = 'F:/QQ栋'
+# path = 'I:/QQ栋'
 buffer = 'z:/buffer'
 
 dirs = os.listdir(path)
@@ -23,6 +23,13 @@ for d in dirs:
     strs = d.split(' - ')
 
     if len(strs) == 2:
+        singer = strs[0]
+        if singer.find('，') != -1 or singer.find(';') != -1 or singer.find(',') != -1:
+            singer = singer.replace('，', ' & ')
+            singer = singer.replace(';', ' & ')
+            singer = singer.replace(',', ' & ')
+            strs = '%s - %s' % (singer, strs[1])
+            rename(pathh + d, pathh + strs)
         continue
     elif len(strs) > 2:
         strs = d.split(' - ', 1)

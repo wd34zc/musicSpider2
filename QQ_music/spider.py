@@ -89,7 +89,7 @@ class QQMusicSpider:
             for ss in singers:
                 ss = ss['name']
                 if singer != '':
-                    singer += '，'
+                    singer += ' & '
                 singer += ss
             if title == o_title and singer == o_singer:
                 return mid
@@ -102,5 +102,11 @@ class QQMusicSpider:
             i = i+1
             album = song['album']['name']
             title = song['title']
-            singer = song['singer'][0]['name']
+            singers = song['singer']
+            singer = ''
+            for s in singers:
+                s = s['name']
+                if singer != '':
+                    singer += ' & '
+                singer += s
             print(str(i) + '  歌曲：【' + title + '】  歌手：【' + singer + "】  专辑：【" + album + '】');
