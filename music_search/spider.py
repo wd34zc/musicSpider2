@@ -12,16 +12,17 @@ from music_search.header import Header
 
 class MusicSearchSpider:
     @staticmethod
-    def music_search_spider(song_url, path):
+    def music_search_spider(song_url, path, flag=True):
         html = MusicSearchSpider.spider1(song_url)
 
         url2, singer, song = MusicSearchSpider.parse(html)
         music_name = singer + ' - ' + song + '.mp3'
-        if IOUtil.music_exist(path, music_name):
-            print('歌曲：' + song + ' 已存在。')
-            flag = input('是否覆盖[Y/N]')
-            if flag is not 'y' and flag is not 'Y':
-                return
+        if flag:
+            if IOUtil.music_exist(path, music_name):
+                print('歌曲：' + song + ' 已存在。')
+                flag = input('是否覆盖[Y/N]')
+                if flag is not 'y' and flag is not 'Y':
+                    return
         if url2 is None:
             print(song + "获取下载连接失败。")
         # music = MusicSearchSpider.download_music_with_tqdm(url2, path, music_name)

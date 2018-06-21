@@ -9,10 +9,23 @@ class QQMusicSpider:
     def search(song):
         html = QQMusicSpider.QQ_music_spider(song)
         # mid = QQMusicSpider.get_music_id(html)
-        mid = QQMusicSpider.select_music_id(html)
+        mid = QQMusicSpider.select_music_id(html, QQMusicSpider.select_by_person)
         url = UrlUtil.get_music_home(mid)
         print(url)
         return url
+
+    @staticmethod
+    def update_search(songs):
+        urls = []
+        for song in songs:
+            key = '%s - %s' % (song.title, song.singer)
+            html = QQMusicSpider.QQ_music_spider(key)
+            args = (song,)
+            mid = QQMusicSpider.select_music_id(html, QQMusicSpider.select_by_former, args)
+            if mid is not None:
+                url = UrlUtil.get_music_home(mid)
+                urls.append(url)
+        return urls
 
     @staticmethod
     def QQ_music_spider(song):
@@ -35,11 +48,16 @@ class QQMusicSpider:
         return mid
 
     @staticmethod
-    def select_music_id(html):
+    def select_music_id(html, select_func, args=()):
         result = re.match("[\w']*\(({[\w\W]*})\)", html).group(1)
         # print(result)
         data = json.loads(result, strict=False)
         song_list = data['data']['song']['list']
+        mid = select_func(song_list, args)
+        return mid
+
+    @staticmethod
+    def select_by_person(song_list, args=None):
         QQMusicSpider.show_music(song_list)
         flag = 0
         while flag is 0:
@@ -55,6 +73,27 @@ class QQMusicSpider:
                 print("退出直接关闭窗口。")
         print(mid)
         return mid
+
+    @staticmethod
+    def select_by_former(song_list, args):
+        # print(song_list)
+        # print(args[0])
+        song = args[0]
+        o_title = song.title
+        o_singer = song.singer
+        for s in song_list:
+            mid = s['mid']
+            title = s['title']
+            singers = s['singer']
+            singer = ''
+            for ss in singers:
+                ss = ss['name']
+                if singer != '':
+                    singer += '，'
+                singer += ss
+            if title == o_title and singer == o_singer:
+                return mid
+        print('找不到匹配音乐：%s - %s.mp3' % (o_singer, o_title))
 
     @staticmethod
     def show_music(song_list):
